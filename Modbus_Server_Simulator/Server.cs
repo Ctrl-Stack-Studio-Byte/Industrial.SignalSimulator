@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentModbus;
 
-namespace Industrial.SignalSimulator1 {
+namespace Modbus_Server_Simulator {
   internal class Server {
     static void Main(string[] args) {
       var server = new ModbusTcpServer();
