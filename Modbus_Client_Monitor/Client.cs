@@ -3,49 +3,44 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+
 namespace Modbus_Client_Monitor {
   internal class Client {
-
-    const byte PLC_UNIT_ID = 0;
-    const ushort TEMP_ADDR = 0;
-    const ushort COUNT_ADDR = 1;
-    const ushort READ_QTY = 2;
-    const ushort RESET_VALUE = 0;
-    const ushort START_COMMAND = 1;
-
-
+    private const ushort TEMP_ADDR = 0;    
+    private const ushort READ_QTY = 2;
+    private const ushort COUNT_ADDR = 1;
+    private const ushort RESET_VALUE = 0;
     static void Main(string[] args) {
 
       // Initialize the client.
-      var client = new ModbusTcpClient();
+      var mbs = new ModbusServices("127.0.0.1",50200);
+      mbs.Connect();
 
-      // Connect to the local server on port 5200.
-      client.Connect(new IPEndPoint(IPAddress.Loopback, 5200));
-      Console.WriteLine("Connect success. Monitoring started.");
 
       while(true) {
 
-        var data = client.ReadHoldingRegisters<ushort>(PLC_UNIT_ID, TEMP_ADDR, READ_QTY);
-
+        short[] data = mbs.Read(TEMP_ADDR, READ_QTY);
         double temperature = data[0] / 10.0f;
         int counter = data[1];
+
 
         // Use a Timestamp to show when the data was received.
         string time = DateTime.Now.ToString("yyyy/MM/dd/HH:mm:ss:ff");
 
         Console.WriteLine($"[{time}] Temperature{temperature:F2}°C | Counter: {counter}.");
 
+        if(counter >= 20) {
 
-        if(counter >= 100) {
           Console.WriteLine("!!! Counter limit reached. Sending Reset Command... !!!");
-          client.WriteSingleRegister(PLC_UNIT_ID,COUNT_ADDR,RESET_VALUE);
+          mbs.Write(COUNT_ADDR, RESET_VALUE);
           Console.WriteLine("!!! Reset Successful !!!");
-        }
 
+        }
 
         Thread.Sleep(1000);
       }
