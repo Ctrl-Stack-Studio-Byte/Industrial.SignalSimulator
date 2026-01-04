@@ -16,8 +16,8 @@ namespace Modbus_Server_Simulator {
 
       Random random = new Random();
 
-      server.Start(new IPEndPoint(IPAddress.Any,5200));
-      Console.WriteLine("Modbus Server Started on Port 5200...");
+      server.Start(new IPEndPoint(IPAddress.Any,50200));
+      Console.WriteLine("Modbus Server Started on Port 50200...");
 
 
       while(true) {
